@@ -1,0 +1,59 @@
+<html>
+  <head>
+	<script src="https://cdn.firebase.com/js/client/1.0.21/firebase.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+		google.load("visualization", "1", {packages:["corechart"]});
+		google.setOnLoadCallback(init);
+		  
+		var jsonData;
+		var googleTable;
+		  
+		function init(){
+			makeFbRef();
+		}
+	
+		function makeFbRef(){
+		FbRef = new Firebase("https://ghettospotter.firebaseio.com/getLight/");
+		
+		FbRef.on('child_changed', function (snapshot) {
+				//start();
+				//alert("loading data....");
+				jsonData = snapshot.val();
+				drawChart();
+				});
+		}
+
+		function drawChart() {
+        
+		googleTable = new google.visualization.DataTable(
+		{
+			cols: [{id: 'A', label: 'Index', type: 'number'},
+				  {id: 'A', label: 'Light', type: 'number'}
+				  ]
+			},
+				0.6
+		)
+		
+		//alert(JSON.stringify(jsonData));
+		//adding lines to graph
+		var arraySize = 1000;
+		for(var i=0; i<arraySize; i++)
+		{
+			googleTable.addRow([i,jsonData[i]]); 
+		}
+		var data = googleTable;
+        var options = {
+          title: 'Who Shit in the Bed?',
+          vAxis: { title: "Light", viewWindowMode:'explicit', viewWindow:{max:65535, min:0}}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 100%; height: 100%;"> Waiting for a reading.....</div>
+  </body>
+</html>
