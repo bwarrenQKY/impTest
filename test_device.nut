@@ -11,7 +11,7 @@ function readLight()
 {
     ambientLight = hardware.lightlevel();
     sendToAgent();
-    imp.wakeup(10, readLight.bindenv(this));
+    imp.wakeup(11, readLight.bindenv(this));
 }
 
 readLight();
