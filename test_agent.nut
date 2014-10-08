@@ -2,9 +2,10 @@ server.log("-------------------------------------------");
 server.log("AGENT STARTED");
 server.log("-------------------------------------------");
 
-firebaseURL <- "https://ghettospotter.firebaseio.com/getLight.json";
+getLightURL <- "https://ghettospotter.firebaseio.com/getLight.json";
+getPingURL <- "https://ghettospotter.firebaseio.com/getPing.json";
 header <- { "Content-Type" : "application/json" };
-arraySize <- 1000;
+arraySize <- 2880;
 
 twilioURL <- "https://AC8e205884fb42550456cfff34546b06e2:c61c522555f96608acd1b6015b9ee823@api.twilio.com/2010-04-01/Accounts/AC8e205884fb42550456cfff34546b06e2/Messages.json";
 twilioHeader <- { "Content-Type" : "application/x-www-form-urlencoded" };
@@ -12,6 +13,24 @@ numberTo <- "+12485066095";
 numberFrom <- "+13139243504";
 
 ambientLightArray <- array(arraySize, 0);
+
+function postPingTime(pingTimeValue)
+{
+    local preparedPost;
+    preparedPost = http.put(getPingURL, header, http.jsonencode(pingTimeValue));
+    preparedPost.sendsync();
+}
+
+function pong(pingTime)
+{
+    server.log("Ping Time = " + pingTime);
+    device.send("Pong", 0);
+
+    if(pingTime > 0)
+    {
+        postPingTime(pingTime);
+    }
+}
 
 function sendSMS(bodyMessage)
 {
@@ -22,7 +41,7 @@ function sendSMS(bodyMessage)
     local response = request.sendasync(function(done) {});
 }
 
-function postToFirebase(ambientLightReading)
+function postLightReading(ambientLightReading)
 {
     ambientLightArray.remove(0);    
     ambientLightArray.push(ambientLightReading);
@@ -35,10 +54,11 @@ function postToFirebase(ambientLightReading)
     server.log("Ambient Light = " + ambientLightReading);
 
     local preparedPost;
-    preparedPost = http.put(firebaseURL, header, http.jsonencode(dataTable));
+    preparedPost = http.put(getLightURL, header, http.jsonencode(dataTable));
     preparedPost.sendsync();
 }
 
-device.on("AmbientLightReading", postToFirebase);
+device.on("AmbientLightReading", postLightReading);
 device.on("SMS", sendSMS);
+device.on("Ping", pong);
 

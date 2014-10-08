@@ -9,48 +9,60 @@
 		var jsonData;
 		var googleTable;
 		  
-		function init(){
+		function init()
+        {
 			makeFbRef();
 		}
-	
-		function makeFbRef(){
-		FbRef = new Firebase("https://ghettospotter.firebaseio.com/getLight/");
-		
-		FbRef.on('child_changed', function (snapshot) {
+	    
+        function makeFbRef()
+        {
+    		FbRef = new Firebase("https://ghettospotter.firebaseio.com/getLight/");
+    		
+    		FbRef.on('child_changed', function (snapshot){
 				//start();
 				//alert("loading data....");
 				jsonData = snapshot.val();
 				drawChart();
-				});
+			});
 		}
 
-		function drawChart() {
+		function drawChart()
+        {
         
-		googleTable = new google.visualization.DataTable(
-		{
-			cols: [{id: 'A', label: 'Index', type: 'number'},
-				  {id: 'A', label: 'Light', type: 'number'}
-				  ]
+		    googleTable = new google.visualization.DataTable(
+		    {
+			    cols: [{id: 'timeOfReading', label: 'Time', type: 'number'},
+				      {id: 'lightValue', label: 'Light', type: 'number'}
+				      ]
 			},
-				0.6
-		)
+		    0.6
+		    )
 		
-		//alert(JSON.stringify(jsonData));
-		//adding lines to graph
-		var arraySize = 1000;
-		for(var i=0; i<arraySize; i++)
-		{
-			googleTable.addRow([i,jsonData[i]]); 
-		}
-		var data = googleTable;
-        var options = {
-          title: 'Who Shit in the Bed?',
-          vAxis: { title: "Light", viewWindowMode:'explicit', viewWindow:{max:65535, min:0}}
-        };
+		    //alert(JSON.stringify(jsonData));
+    		//adding lines to graph
+    		var arraySize = 2880;
+    		for(var i=0; i<arraySize; i++)
+    		{
+    			googleTable.addRow([i,jsonData[i]]); 
+    		}
 
-        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
+    		var data = googleTable;
+            var options = 
+            {
+                title: 'How bright is it outside?',
+                'vAxis' : { 
+                    title: "Light",
+                    viewWindowMode:'explicit',
+                    viewWindow:{max:65535, min:0}
+                },
+                'hAxis' : { 
+                    title: "Time",
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+            chart.draw(data, options);
+        }
     </script>
   </head>
   <body>
